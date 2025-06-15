@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoiceClone.fifi</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <script defer src="https://unpkg.com/wavesurfer.js"></script>
+  <script defer>
+    let mediaRecorder;
+    let audioChunks = [];document.addEventListener("DOMContentLoaded", () => {
+  const recordBtn = document.getElementById("recordBtn");
+  const voiceInput = document.getElementById("voiceInput");
+  const recordingStatus = document.getElementById("recordingStatus");
+  const cloneBtn = document.getElementById("cloneBtn");
+  const textInput = document.getElementById("textInput");
+  const outputArea = document.getElementById("outputArea");
+  const clonedAudio = document.getElementById("clonedAudio");
+  const downloadLink = document.getElementById("downloadLink");
+
+  recordBtn.addEventListener("click", async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    recordingStatus.classList.remove("hidden");
+
+    mediaRecorder.addEventListener("dataavailable", event => {
+      audioChunks.push(event.data);
+    });
+
+    mediaRecorder.addEventListener("stop", () => {
+      const audioBlob = new Blob(audioChunks);
+      const audioUrl = URL.createObjectURL(audioBlob);
+      clonedAudio.src = audioUrl;
+      downloadLink.href = audioUrl;
+      downloadLink.download = "recording.wav";
+      outputArea.classList.remove("hidden");
+      recordingStatus.classList.add("hidden");
+    });
+
+    setTimeout(() => mediaRecorder.stop(), 5000); // Record 5 seconds
+    mediaRecorder.start();
+  });
+
+  cloneBtn.addEventListener("click", () => {
+    alert("Voice cloning backend is not connected in this demo. You can plug in your Colab or API.");
+  });
+});
+
+  </script>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center p-4 min-h-screen">
+  <h1 class="text-3xl font-bold mb-6 mt-4">🔊 VoiceClone.fifi</h1>  <div class="w-full max-w-md bg-gray-800 p-6 rounded-2xl shadow-xl">
+    <label class="block mb-2">Upload Voice Sample</label>
+    <input id="voiceInput" type="file" accept="audio/*" class="mb-4 w-full text-gray-900"><label class="block mb-2">Or Record Your Voice</label>
+<button id="recordBtn" class="w-full py-2 mb-4 bg-indigo-600 hover:bg-indigo-700 rounded-xl">🎙️ Start Recording</button>
+<div id="recordingStatus" class="mb-4 text-center text-sm text-green-400 hidden">Recording...</div>
+
+<label class="block mb-2">Enter Text</label>
+<textarea id="textInput" rows="4" class="w-full text-black p-2 rounded-md mb-4"></textarea>
+
+<button id="cloneBtn" class="w-full py-2 bg-green-600 hover:bg-green-700 rounded-xl">✨ Clone Voice</button>
+<div id="outputArea" class="mt-6 hidden">
+  <p class="mb-2">🔉 Cloned Audio:</p>
+  <audio id="clonedAudio" controls class="w-full"></audio>
+  <a id="downloadLink" href="#" download class="block mt-2 text-blue-400 underline">Download Audio</a>
+</div>
+
+  </div>  <footer class="mt-auto pt-10 text-sm text-gray-400">
+    VoiceClone.fifi by techdollar | Hindi & Urdu supported 🎧
+  </footer>
+</body>
+</html>
